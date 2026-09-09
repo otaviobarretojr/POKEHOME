@@ -8,8 +8,8 @@ android {
         applicationId = "com.otaviobarreto.pokehome"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12025
-        versionName = "12.25"
+        versionCode = 12026
+        versionName = "12.26"
     }
 
     buildTypes {

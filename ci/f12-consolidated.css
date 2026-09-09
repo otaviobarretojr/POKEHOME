@@ -1,0 +1,31 @@
+/* F12.26 — canonical surface isolation */
+body.f12-consolidated{background:#06111c!important;overflow-x:hidden}
+body.f12-consolidated .wrap>.top,
+body.f12-consolidated .wrap>.nav,
+body.f12-consolidated .wrap>.mobile-nav,
+body.f12-consolidated .wrap>#mobileMore,
+body.f12-consolidated .wrap>#mobileMoreBackdrop,
+body.f12-consolidated .wrap>.statusbar,
+body.f12-consolidated .wrap>.footer,
+body.f12-consolidated .wrap>.view:not(#home),
+body.f12-consolidated #home>.f12-legacy-home-child{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.f12-consolidated #home{display:block!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}
+body.f12-consolidated #f12Home{display:block!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}
+body.f12-consolidated #f12Dex,
+body.f12-consolidated #f12Box{display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important}
+body.f12-consolidated[data-f12-route="dex"] #home,
+body.f12-consolidated[data-f12-route="box"] #home{display:none!important}
+body.f12-consolidated[data-f12-route="dex"] #f12Dex{display:block!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}
+body.f12-consolidated[data-f12-route="box"] #f12Box{display:block!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}
+body.f12-consolidated .f12-shellbar{display:flex!important;position:sticky;top:0;z-index:500;background:linear-gradient(135deg,#245da7,#356db4);border-radius:0 0 18px 18px;padding:16px 18px;align-items:center;gap:12px;color:#fff;box-shadow:0 8px 28px #0004}
+body.f12-consolidated .f12-title{min-width:0;display:flex;flex-direction:column;flex:1}
+body.f12-consolidated .f12-title b{font-size:19px;letter-spacing:.3px}
+body.f12-consolidated .f12-title small{opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.f12-consolidated .f12-searchbtn{width:48px;height:48px;border:0;border-radius:16px;background:#ffffff18;color:#fff;font-size:28px}
+body.f12-consolidated .f12-canonical-nav{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:1000!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;background:#fff!important;border-top:1px solid #dbe4ef!important;box-shadow:0 -8px 30px #0002!important;padding:7px 10px calc(7px + env(safe-area-inset-bottom))!important}
+body.f12-consolidated .f12-canonical-nav button{appearance:none;border:0;background:transparent;color:#7a8797;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-weight:700;font-size:12px;touch-action:manipulation;pointer-events:auto!important}
+body.f12-consolidated .f12-canonical-nav button svg{width:24px;height:24px}
+body.f12-consolidated .f12-canonical-nav button.active{color:#2666b3}
+body.f12-consolidated .wrap{padding-bottom:82px!important;max-width:100%!important}
+body.f12-consolidated #f12PokemonDetail{z-index:2000!important}
+body.f12-consolidated button,body.f12-consolidated [role="button"],body.f12-consolidated input,body.f12-consolidated select{pointer-events:auto;touch-action:manipulation}

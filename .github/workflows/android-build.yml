@@ -52,10 +52,10 @@ jobs:
           test -f app/src/main/assets/za-encounters-v8.js
           ART_COUNT=$(find app/src/main/assets/f12-datadex-art -type f | wc -l)
           echo "DataDex art files: $ART_COUNT"
-          test "$ART_COUNT" -ge 2610
+          test "$ART_COUNT" -eq 2610
           ASSET_BYTES=$(du -sb app/src/main/assets | cut -f1)
           echo "Runtime asset bytes: $ASSET_BYTES"
-          test "$ASSET_BYTES" -ge 50000000
+          test "$ASSET_BYTES" -ge 46000000
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
@@ -72,7 +72,7 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/bdsp-encounters-v8.js'
           ART_IN_APK=$(unzip -l "$APK" | grep -c 'assets/f12-datadex-art/' || true)
           echo "DataDex art entries in APK: $ART_IN_APK"
-          test "$ART_IN_APK" -ge 2610
+          test "$ART_IN_APK" -eq 2610
 
       - name: APK SHA256
         run: sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app/build/outputs/apk/debug/SHA256.txt

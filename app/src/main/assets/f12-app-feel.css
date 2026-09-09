@@ -1,0 +1,11 @@
+/* F12.24 — subtle app feel and capture feedback */
+#f12ToastHost{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;display:grid;gap:8px;pointer-events:none;width:min(88vw,420px)}
+.f12toast{margin:auto;background:rgba(20,22,27,.94);color:#fff;padding:11px 15px;border-radius:16px;font:600 13px/1.25 system-ui,-apple-system,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.22);animation:f12ToastIn .2s ease-out both}
+.f12toast.out{animation:f12ToastOut .18s ease-in both}
+@keyframes f12ToastIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes f12ToastOut{to{opacity:0;transform:translateY(6px) scale(.98)}}
+[data-f12-add].f12-capture-pop,[data-add-game].f12-capture-pop{animation:f12CapturePop .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes f12CapturePop{45%{transform:scale(.9)}75%{transform:scale(1.08)}100%{transform:scale(1)}}
+.f12-detail-root,.f12pokedex,.f12box,.f12home{animation:f12SurfaceIn .18s ease-out both}
+@keyframes f12SurfaceIn{from{opacity:.72;transform:translateY(3px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.f12toast,[data-f12-add].f12-capture-pop,[data-add-game].f12-capture-pop,.f12-detail-root,.f12pokedex,.f12box,.f12home{animation:none!important;transition:none!important}}

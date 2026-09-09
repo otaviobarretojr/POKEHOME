@@ -16,44 +16,51 @@ jobs:
         with:
           gradle-version: '9.5.0'
 
-      - name: Expand complete F12.25 source package
+      - name: Expand F12.25 data package and apply F12.26 consolidation
         run: |
           set -euo pipefail
           PACKAGE='LivingDexHub-F12.25-Beta-Candidate-Source.zip'
           test -f "$PACKAGE"
-          test -f ci/f12-runtime-repair.js
+          test -f ci/f12-shell-consolidated.js
+          test -f ci/f12-consolidated.css
           rm -rf /tmp/f1225
           mkdir -p /tmp/f1225
           unzip -q "$PACKAGE" -d /tmp/f1225
-          SRC=$(find /tmp/f1225 -type f -path '*/app/src/main/assets/index.html' -print -quit)
-          test -n "$SRC"
-          PROJECT_ROOT=${SRC%/app/src/main/assets}
-          echo "F12.25 project root: $PROJECT_ROOT"
+          INDEX=$(find /tmp/f1225 -type f -path '*/app/src/main/assets/index.html' -print -quit)
+          test -n "$INDEX"
+          ASSETS_DIR=$(dirname "$INDEX")
+          PROJECT_ROOT=${ASSETS_DIR%/app/src/main/assets}
+          echo "F12 project root: $PROJECT_ROOT"
           rm -rf app/src/main/assets
-          cp -a "$PROJECT_ROOT/app/src/main/assets" app/src/main/
-          cp ci/f12-runtime-repair.js app/src/main/assets/f12-runtime-repair.js
+          cp -a "$ASSETS_DIR" app/src/main/assets
+          cp ci/f12-shell-consolidated.js app/src/main/assets/f12-shell.js
+          cp ci/f12-consolidated.css app/src/main/assets/f12-consolidated.css
           python3 - <<'PY'
           from pathlib import Path
           p=Path('app/src/main/assets/index.html')
           s=p.read_text(encoding='utf-8')
-          tag='<script src="f12-runtime-repair.js" data-f12="interaction-repair-12.25.1"></script>'
-          if tag not in s:
-              s=s.replace('</body>', tag+'\n</body>')
+          css='<link rel="stylesheet" href="f12-consolidated.css" data-f12="consolidated-12.26">'
+          if css not in s:
+              s=s.replace('</head>', css+'\n</head>')
           p.write_text(s, encoding='utf-8')
           PY
 
-      - name: Validate complete F12.25 runtime
+      - name: Validate F12.26 consolidated runtime
         run: |
           set -euo pipefail
           test -f app/src/main/assets/index.html
+          test -f app/src/main/assets/f12-shell.js
+          test -f app/src/main/assets/f12-consolidated.css
+          grep -q 'F12.26 — consolidated canonical router' app/src/main/assets/f12-shell.js
+          grep -q 'f12-consolidated.css' app/src/main/assets/index.html
+          ! grep -q 'window.ld71Close' app/src/main/assets/f12-shell.js
+          ! grep -q 'window.ld7Home' app/src/main/assets/f12-shell.js
+          ! grep -q 'window.go' app/src/main/assets/f12-shell.js
           test -f app/src/main/assets/f12-collection.js
           test -f app/src/main/assets/f12-pokedex.js
           test -f app/src/main/assets/f12-detail.js
           test -f app/src/main/assets/f12-box.js
           test -f app/src/main/assets/f12-home.js
-          test -f app/src/main/assets/f12-beta-audit.js
-          test -f app/src/main/assets/f12-runtime-repair.js
-          grep -q 'f12-runtime-repair.js' app/src/main/assets/index.html
           test -f app/src/main/assets/f12-pokedex-data.js
           test -f app/src/main/assets/f12-detail-data.js
           test -f app/src/main/assets/f12-form-data.js
@@ -63,6 +70,12 @@ jobs:
           test -f app/src/main/assets/pla-encounters-v8.js
           test -f app/src/main/assets/sv-encounters-v8.js
           test -f app/src/main/assets/za-encounters-v8.js
+          node --check app/src/main/assets/f12-shell.js
+          node --check app/src/main/assets/f12-home.js
+          node --check app/src/main/assets/f12-pokedex.js
+          node --check app/src/main/assets/f12-box.js
+          node --check app/src/main/assets/f12-detail.js
+          node --check app/src/main/assets/f12-collection.js
           ART_COUNT=$(find app/src/main/assets/f12-datadex-art -type f | wc -l)
           echo "DataDex art files: $ART_COUNT"
           test "$ART_COUNT" -eq 2610
@@ -84,10 +97,12 @@ jobs:
           unzip -Z1 "$APK" > /tmp/apk-files.txt
           grep -q '^assets/f12-datadex-art/' /tmp/apk-files.txt
           grep -q '^assets/bdsp-encounters-v8.js$' /tmp/apk-files.txt
-          grep -q '^assets/f12-runtime-repair.js$' /tmp/apk-files.txt
+          grep -q '^assets/f12-consolidated.css$' /tmp/apk-files.txt
           ART_IN_APK=$(grep -c '^assets/f12-datadex-art/' /tmp/apk-files.txt || true)
           echo "DataDex art entries in APK: $ART_IN_APK"
           test "$ART_IN_APK" -eq 2610
+          unzip -p "$APK" assets/f12-shell.js | grep -q 'F12.26 — consolidated canonical router'
+          unzip -p "$APK" assets/index.html | grep -q 'f12-consolidated.css'
 
       - name: APK SHA256
         run: sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app/build/outputs/apk/debug/SHA256.txt
@@ -95,7 +110,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: POKEHOME-F12.25.1-interaction-fix-debug-apk
+          name: POKEHOME-F12.26-consolidated-debug-apk
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/SHA256.txt

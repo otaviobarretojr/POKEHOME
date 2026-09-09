@@ -15,6 +15,22 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.5.0'
+
+      - name: Expand complete F12.25 source package
+        run: |
+          set -euo pipefail
+          PACKAGE='LivingDexHub-F12.25-Beta-Candidate-Source.zip'
+          test -f "$PACKAGE"
+          rm -rf /tmp/f1225
+          mkdir -p /tmp/f1225
+          unzip -q "$PACKAGE" -d /tmp/f1225
+          SRC=$(find /tmp/f1225 -type f -path '*/app/src/main/assets/index.html' -printf '%h\n' | head -n1)
+          test -n "$SRC"
+          PROJECT_ROOT=${SRC%/app/src/main/assets}
+          echo "F12.25 project root: $PROJECT_ROOT"
+          rm -rf app/src/main/assets
+          cp -a "$PROJECT_ROOT/app/src/main/assets" app/src/main/
+
       - name: Validate complete F12.25 runtime
         run: |
           set -euo pipefail
@@ -34,14 +50,16 @@ jobs:
           test -f app/src/main/assets/pla-encounters-v8.js
           test -f app/src/main/assets/sv-encounters-v8.js
           test -f app/src/main/assets/za-encounters-v8.js
-          ART_COUNT=$(find app/src/main/assets/f12-datadex-art -type f 2>/dev/null | wc -l)
+          ART_COUNT=$(find app/src/main/assets/f12-datadex-art -type f | wc -l)
           echo "DataDex art files: $ART_COUNT"
           test "$ART_COUNT" -ge 2610
           ASSET_BYTES=$(du -sb app/src/main/assets | cut -f1)
           echo "Runtime asset bytes: $ASSET_BYTES"
           test "$ASSET_BYTES" -ge 50000000
+
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
+
       - name: Validate APK payload
         run: |
           set -euo pipefail
@@ -52,8 +70,13 @@ jobs:
           test "$APK_BYTES" -ge 20000000
           unzip -l "$APK" | grep -q 'assets/f12-datadex-art/'
           unzip -l "$APK" | grep -q 'assets/bdsp-encounters-v8.js'
+          ART_IN_APK=$(unzip -l "$APK" | grep -c 'assets/f12-datadex-art/' || true)
+          echo "DataDex art entries in APK: $ART_IN_APK"
+          test "$ART_IN_APK" -ge 2610
+
       - name: APK SHA256
         run: sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app/build/outputs/apk/debug/SHA256.txt
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

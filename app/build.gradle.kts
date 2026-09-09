@@ -5,7 +5,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.otaviobarreto.livingdex"
+        applicationId = "com.otaviobarreto.pokehome"
         minSdk = 26
         targetSdk = 36
         versionCode = 12025
